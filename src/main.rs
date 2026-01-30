@@ -1,4 +1,5 @@
 use eframe::egui;
+//use egui::{Label, FontId};
 use std::time::Instant;
 
 struct TapApp {
@@ -83,7 +84,7 @@ impl eframe::App for TapApp {
         }
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.vertical_centered(|ui| {
+            ui.vertical(|ui| {
                 if ui.button("Reset").clicked() {
                     self.reset();
                 }
@@ -108,7 +109,10 @@ impl eframe::App for TapApp {
 }
 
 fn main() -> eframe::Result<()> {
-    let options = eframe::NativeOptions::default();
+    let options = eframe::NativeOptions {
+        viewport: Some(eframe::epi::WindowSize::new(300.0, 200.0)),
+        ..Default::default()
+    };
     eframe::run_native(
         "Tap BPM",
         options,
