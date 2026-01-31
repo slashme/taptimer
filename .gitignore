@@ -1,2 +1,9 @@
 /target
 .*swp
+
+# Debian packaging build artifacts
+debian/**/*.deb
+debian/**/*.build
+debian/**/*.changes
+debian/**/*.substvars
+debian/**/*.log
