@@ -79,6 +79,7 @@ impl TapApp {
 
 impl eframe::App for TapApp {
     fn update(&mut self, ctx: &egui::Context, _: &mut eframe::Frame) {
+        ctx.set_pixels_per_point(2.0);
         if ctx.input(|i| i.key_pressed(egui::Key::Space)) {
             self.register_tap();
         }
