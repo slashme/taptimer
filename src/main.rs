@@ -93,13 +93,15 @@ impl eframe::App for TapApp {
                 ui.add_space(20.0);
 
                 ui.label(format!(
-                    "Lower 95% CI: {:.2}",
-                    self.ci_low.unwrap_or(0.0)
+                        "Lower 95% CI: {:.2}",
+                        self.ci_low.unwrap_or(0.0)
                 ));
-                ui.label(format!(
-                    "BPM: {:.2}",
-                    self.bpm.unwrap_or(0.0)
-                ));
+                ui.label(egui::RichText::new(format!(
+                            "BPM: {:.2}",
+                            self.bpm.unwrap_or(0.0)
+                ))
+                    .color(egui::Color32::WHITE)
+                );
                 ui.label(format!(
                     "Upper 95% CI: {:.2}",
                     self.ci_high.unwrap_or(0.0)
