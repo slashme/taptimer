@@ -1,0 +1,9 @@
+Package: taptimer
+Version: 0.1.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Depends: libc6 (>= 2.39)
+Maintainer: David Richfield <davidrichfield@gmail.com>
+Description: taptimer BPM timer
+ A simple BPM timer: tap the space bar in time to the music.
