@@ -110,7 +110,8 @@ impl eframe::App for TapApp {
 
 fn main() -> eframe::Result<()> {
     let options = eframe::NativeOptions {
-        viewport: Some(eframe::epi::WindowSize::new(300.0, 200.0)),
+        viewport: egui::ViewportBuilder::default()
+            .with_inner_size([300.0, 200.0]),
         ..Default::default()
     };
     eframe::run_native(
