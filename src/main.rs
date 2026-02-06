@@ -1,10 +1,9 @@
-use eframe::egui;
-//use egui::{Label, FontId};
+use std::io::{self};
 use std::time::Instant;
 
 struct TapApp {
-    taps: Vec<f64>,          // tap timestamps (seconds)
-    start: Option<Instant>,  // reference start time
+    taps: Vec<f64>,         // tap timestamps (seconds)
+    start: Option<Instant>, // reference start time
     bpm: Option<f64>,
     ci_low: Option<f64>,
     ci_high: Option<f64>,
@@ -28,12 +27,10 @@ impl TapApp {
     }
 
     fn register_tap(&mut self) {
-        let now = Instant::now();
-
-        let t = match self.start {
-            Some(start) => now.duration_since(start).as_secs_f64(),
+        let t = match &self.start {
+            Some(start) => start.elapsed().as_secs_f64(),
             None => {
-                self.start = Some(now);
+                self.start = Some(Instant::now());
                 0.0
             }
         };
@@ -46,20 +43,12 @@ impl TapApp {
     }
 
     fn compute_stats(&mut self) {
-        let intervals: Vec<f64> = self
-            .taps
-            .windows(2)
-            .map(|w| w[1] - w[0])
-            .collect();
+        let intervals: Vec<f64> = self.taps.windows(2).map(|w| w[1] - w[0]).collect();
 
         let n = intervals.len() as f64;
         let mean = intervals.iter().sum::<f64>() / n;
 
-        let var = intervals
-            .iter()
-            .map(|x| (x - mean).powi(2))
-            .sum::<f64>()
-            / (n - 1.0).max(1.0);
+        let var = intervals.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / (n - 1.0).max(1.0);
 
         let std = var.sqrt();
 
@@ -75,51 +64,48 @@ impl TapApp {
             self.ci_high = Some(60.0 / ci_mean_low);
         }
     }
-}
 
-impl eframe::App for TapApp {
-    fn update(&mut self, ctx: &egui::Context, _: &mut eframe::Frame) {
-        ctx.set_pixels_per_point(2.0);
-        if ctx.input(|i| i.key_pressed(egui::Key::Space)) {
-            self.register_tap();
+    fn print_stats(&self) {
+        if let Some(bpm) = self.bpm {
+            print!("\nBPM: {:.2}", bpm);
+            if let (Some(ci_low), Some(ci_high)) = (self.ci_low, self.ci_high) {
+                println!(" ({:.2} - {:.2})", ci_low, ci_high);
+            } else {
+                println!();
+            }
         }
-
-        egui::CentralPanel::default().show(ctx, |ui| {
-            ui.vertical(|ui| {
-                if ui.button("Reset").clicked() {
-                    self.reset();
-                }
-
-                ui.add_space(20.0);
-
-                ui.label(format!(
-                        "Lower 95% CI: {:.2}",
-                        self.ci_low.unwrap_or(0.0)
-                ));
-                ui.label(egui::RichText::new(format!(
-                            "BPM: {:.2}",
-                            self.bpm.unwrap_or(0.0)
-                ))
-                    .color(egui::Color32::WHITE)
-                );
-                ui.label(format!(
-                    "Upper 95% CI: {:.2}",
-                    self.ci_high.unwrap_or(0.0)
-                ));
-            });
-        });
     }
 }
 
-fn main() -> eframe::Result<()> {
-    let options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default()
-            .with_inner_size([300.0, 200.0]),
-        ..Default::default()
-    };
-    eframe::run_native(
-        "Tap BPM",
-        options,
-        Box::new(|_cc| Box::new(TapApp::default())),
-    )
+fn main() {
+    let mut app = TapApp::default();
+    let stdin = io::stdin();
+    let mut input_buffer = String::new();
+
+    println!("-------- BPM counter --------");
+    println!("Press ENTER to tap.");
+    println!("Type 'r' then ENTER to reset.");
+    println!("Type 'q' then ENTER to quit.");
+    println!("-----------------------------");
+
+    loop {
+        input_buffer.clear();
+        stdin
+            .read_line(&mut input_buffer)
+            .expect("Read line failed");
+        let command = input_buffer.trim().to_lowercase();
+
+        match command.as_str() {
+            command if command.starts_with("q") => {
+                break;
+            }
+            command if command.starts_with("r") => {
+                app.reset();
+            }
+            _ => {
+                app.register_tap();
+                app.print_stats();
+            }
+        }
+    }
 }
