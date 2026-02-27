@@ -1,7 +1,8 @@
 [package]
 name = "taptimer"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
+description = "BPM timer"
 
 [dependencies]
 eframe = "0.27"
@@ -11,3 +12,19 @@ strip=true
 opt-level="z"
 lto = true
 codegen-units = 1
+
+
+[package.metadata.deb]
+maintainer = "David Richfield <davidrichfield@gmail.com>"
+copyright = "2026, David Richfield"
+license-file = ["LICENSE"]
+extended-description = """A simple beats per minute timer: tap the space bar in time to the music."""
+depends = "$auto"
+section = "utilities"
+priority = "optional"
+
+assets = [
+    ["target/release/taptimer", "usr/bin/", "755"],
+    ["assets/taptimer.desktop", "usr/share/applications/", "644"],
+    ["assets/taptimer.svg", "usr/share/icons/hicolor/scalable/apps/taptimer.svg", "644"],
+]
