@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=TapTimer
+Comment=Simple Tap Timer
+Exec=taptimer
+Icon=taptimer
+Terminal=false
+Type=Application
+Categories=Utility;
+StartupNotify=true
